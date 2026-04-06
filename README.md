@@ -1,6 +1,6 @@
-# todoist.nvim
+# todoist.vim
 
-> A hopefully usable todoist extension for neovim
+> A hopefully usable todoist extension for Vim
 
 > [!WARNING]
 > This repository should work as it is but doesn't receive much maintenance.
@@ -26,20 +26,18 @@ Export it in your `~/.config/environment.d/*.conf`/`~/.profile`/`~/.bashrc`
 export TODOIST_API_KEY="$(pass Todoist/API)"
 ```
 
+Install with your plugin manager of choice:
+
 ```vim
-Plug 'romgrk/todoist.nvim', { 'do': ':TodoistInstall' }
+Plug 'romgrk/todoist.nvim'
 ```
 
-If you don't use [vim-plug](https://github.com/junegunn/vim-plug), run the `TodoistInstall`
-command manually to complete the installation.
+No build step is required — the plugin is pure vim9script.
 
 #### Requirements
 
- - neovim 0.4.0
- - nodejs 10.0.0
- - `npm install -g neovim@latest` (**NOTE**: needs to be at v4.9.0 at least!)
-
-Make sure your nodejs provider works (`:checkhealth` to confirm).
+ - Vim 9.0+
+ - `curl` (for API requests)
 
 ## Usage
 

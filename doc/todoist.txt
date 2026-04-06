@@ -1,7 +1,7 @@
-*todoist.txt* A hopefully usable todoist extension for neovim
+*todoist.txt* A hopefully usable todoist extension for Vim
 
 Author: Rom Grk (https://github.com/romgrk)
-License: Same as Neovim (|license|)
+License: Same as Vim (|license|)
 
 INTRODUCTION                                                          *todoist*
 
@@ -39,16 +39,17 @@ Once you have it, make it available to vim by setting it as a shell variable
   Otherwise:
   `export TODOIST_API_KEY=xxxxxxxx`
 
+No build step is required — the plugin is pure vim9script.
+
 REQUIREMENTS                                             *todoist-requirements*
 
-- Neovim >= 0.4.0
-- Nodejs >= 10.0.0
-- `npm install -g neovim@latest` (NOTE: needs to be V4.9.0 at least)
+- Vim >= 9.0
+- curl (for API requests)
 
 USAGE                                                           *todoist-usage*
 
 `:Todoist [project_name]`
-If no project name is given, the default (`INBOX`) will be used.
+If no project name is given, the default (`Inbox`) will be used.
 
 MAPPINGS                                                     *todoist-mappings*
 
@@ -125,22 +126,19 @@ pleasing:
 
   `let todoist = {`
   `\ 'icons': {`
-  `\   'unchecked': '  ',`
-  `\   'checked':   '  ',`
-  `\   'loading':   '  ',`
-  `\   'error':     '  ',`
+  `\   'unchecked': '  ',`
+  `\   'checked':   '  ',`
+  `\   'loading':   '  ',`
+  `\   'error':     '  ',`
   `\ },`
   `\}`
 
 INTEGRATION                                               *todoist-integration*
 
-If you're using vim-clap (see |todoist-other|), you can integrate project
-selection by adding this to your config files:
+If you're using vim-clap (see |todoist-other|), a provider is automatically
+registered. Use it with:
 
-  `let clap_provider_todoist = {`
-  `\ 'source': {-> Todoist__listProjects()},`
-  `\ 'sink': 'Todoist',`
-  `\}`
+  `:Clap todoist`
 
 OTHER                                                           *todoist-other*
 

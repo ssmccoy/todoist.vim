@@ -1,89 +1,71 @@
-"!::exe [So]
+vim9script
 
-"===============================================================================
-" Installation                                                               {{{
+# todoist.vim — Todoist integration for Vim
+# Requires Vim 9.0+ with vim9script support
 
-command! TodoistInstall call <SID>todoist_install()
+import autoload 'todoist.vim' as todoist
 
-let s:plugin_root = expand('<sfile>:p:h:h')
+# --- Commands ---
 
-function! s:todoist_install ()
-  const cmd = printf('cd %s && npm install', s:plugin_root)
-  echom "Todoist: Installing dependencies..."
-  echom cmd
-  call system(cmd)
-  echom "Todoist: Updating remote plugins..."
-  UpdateRemotePlugins
-  echom "Todoist: Done"
-endfunc
+def CompleteProjects(ArgLead: string, CmdLine: string, CursorPos: number): list<string>
+  return todoist.CompleteProjects(ArgLead, CmdLine, CursorPos)
+enddef
 
-" }}}
-"===============================================================================
-" Highlights                                                                 {{{
+command! -nargs=? -complete=customlist,s:CompleteProjects Todoist todoist.Open(<q-args>)
 
-" Highlights namespace
-let todoist_namespace = nvim_create_namespace('todoist')
+# --- Highlights ---
 
-" Highlighting function
-function! s:hl (name, ...)
-  if hlexists(a:name)
+def SetHighlight(name: string, fg: string = '', bg: string = '', attr: string = '')
+  if hlexists(name)
     return
-  end
+  endif
 
-  let fg = ''
-  let bg = ''
-  let attr = ''
-
-  if type(a:1) == 3
-    let fg   = get(a:1, 0, '')
-    let bg   = get(a:1, 1, '')
-    let attr = get(a:1, 2, '')
-  else
-    let fg   = get(a:000, 0, '')
-    let bg   = get(a:000, 1, '')
-    let attr = get(a:000, 2, '')
-  end
-
-  let cmd = 'hi! ' . a:name
+  var cmd = 'hi! ' .. name
   if !empty(fg)
-    let cmd .= ' guifg=' . fg
-  end
+    cmd ..= ' guifg=' .. fg
+  endif
   if !empty(bg)
-    let cmd .= ' guibg=' . bg
-  end
+    cmd ..= ' guibg=' .. bg
+  endif
   if !empty(attr)
-    let cmd .= ' gui=' . attr
-  end
+    cmd ..= ' gui=' .. attr
+  endif
   execute cmd
-endfunc
+enddef
 
-call s:hl('todoistTitle',            'white', '#e84644', 'bold')
-call s:hl('todoistDateOverdue',      '#FF6D6D')
-call s:hl('todoistDateToday',        '#52E054')
-call s:hl('todoistDateTomorrow',     '#ff8700')
-call s:hl('todoistDateThisWeek',     '#A873FC')
-call s:hl('todoistPri1',             '#D1453B')
-call s:hl('todoistPri2',             '#EB8909')
-call s:hl('todoistPri3',             '#246FE0')
-call s:hl('todoistContent',          '',      '',        'bold')
-call s:hl('todoistContentCompleted', '',      '',        'strikethrough')
+SetHighlight('todoistTitle',            'white', '#e84644', 'bold')
+SetHighlight('todoistDateOverdue',      '#FF6D6D')
+SetHighlight('todoistDateToday',        '#52E054')
+SetHighlight('todoistDateTomorrow',     '#ff8700')
+SetHighlight('todoistDateThisWeek',     '#A873FC')
+SetHighlight('todoistPri1',             '#D1453B')
+SetHighlight('todoistPri2',             '#EB8909')
+SetHighlight('todoistPri3',             '#246FE0')
+SetHighlight('todoistContent',          '',      '',        'bold')
+SetHighlight('todoistContentCompleted', '',      '',        'strikethrough')
 
 hi def link todoistCheckbox    Delimiter
 hi def link todoistDate        Comment
+hi def link todoistSeparator   Normal
+
+# Task detail view highlights
+hi def link todoistTaskTitle       todoistTitle
+hi def link todoistTaskTitleMarker Delimiter
+hi def link todoistTaskKeyName     Type
+hi def link todoistTaskMetaSep     Delimiter
+hi def link todoistTaskOptional    Normal
+hi def link todoistTaskPri1        todoistPri1
+hi def link todoistTaskPri2        todoistPri2
+hi def link todoistTaskPri3        todoistPri3
 
 hi def link todoistErrorIcon      ErrorMsg
 hi def link todoistErrorMessage   ErrorMsg
 hi def link todoistWarningMessage WarningMsg
 hi def link todoistMessage        Comment
 
-" }}}
-"===============================================================================
-" Clap provider                                                              {{{
+# --- Clap provider ---
 
-let clap_provider_todoist = {
-\ 'source': {-> Todoist__listProjects()},
-\ 'sink': 'Todoist',
-\}
-
-" }}}
-"===============================================================================
+g:clap_provider_todoist = {
+  'source': () => todoist.ListProjects(),
+  'sink': 'Todoist',
+}
