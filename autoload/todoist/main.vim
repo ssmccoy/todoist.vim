@@ -36,15 +36,21 @@ def SetupMappings()
   nnoremap <buffer><silent> A    <ScriptCmd>OnCreateDetailed()<CR>
 enddef
 
-# --- Entry point ---
+# --- API key resolution ---
 
-export def Open(project_name: string = '')
+def GetApiKey(): string
   S.LoadOptions()
-
   var key = S.state.options.key
   if empty(key)
     key = $TODOIST_API_KEY
   endif
+  return key
+enddef
+
+# --- Entry point ---
+
+export def Open(project_name: string = '')
+  var key = GetApiKey()
 
   S.state.is_loading = empty(key) ? false : true
   S.state.current_project_name = empty(project_name) ? S.state.options.defaultProject : project_name
@@ -637,7 +643,31 @@ export def ListProjects(): list<string>
   return names
 enddef
 
+def EnsureProjects()
+  if !empty(S.state.projects)
+    return
+  endif
+  var key = GetApiKey()
+  if empty(key)
+    return
+  endif
+  var url = 'https://api.todoist.com/api/v1/projects'
+  var raw = system('curl -sS ' .. shellescape(url)
+    .. ' -H ' .. shellescape('Authorization: Bearer ' .. key))
+  if v:shell_error != 0
+    return
+  endif
+  try
+    var data = json_decode(raw)
+    if type(data) == v:t_dict && has_key(data, 'results')
+      S.state.projects = data.results
+    endif
+  catch
+  endtry
+enddef
+
 export def CompleteProjects(start: string, line: string, pos: number): list<string>
+  EnsureProjects()
   var names: list<string> = []
   for p in S.state.projects
     var name = get(p, 'name', '')
