@@ -75,9 +75,14 @@ enddef
 def CreateBuffer()
   var existing = bufnr('Todoist')
   if existing != -1
-    execute 'buffer ' .. existing
+    var winid = bufwinid(existing)
+    if winid != -1
+      win_gotoid(winid)
+    else
+      execute 'sbuffer ' .. existing
+    endif
   else
-    enew
+    new
     file Todoist
   endif
 
