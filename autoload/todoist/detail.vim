@@ -4,6 +4,7 @@ vim9script
 # Format, parse, and manage the detail buffer for viewing/editing tasks
 
 import './api.vim' as api
+import './comments.vim' as comments
 import './state.vim' as S
 
 # --- Priority mapping ---
@@ -211,7 +212,27 @@ def SetupDetailBuffer(lines: list<string>, task_id: string)
     autocmd BufWriteCmd <buffer> call todoist#detail#SaveBuffer()
   augroup END
 
-  nnoremap <buffer><silent> q <Cmd>bwipe!<CR>
+  nnoremap <buffer><silent> q  <Cmd>bwipe!<CR>
+  nnoremap <buffer><silent> C  <ScriptCmd>OnDetailShowCommentHistory()<CR>
+  nnoremap <buffer><silent> ca <ScriptCmd>OnDetailAddComment()<CR>
+enddef
+
+def OnDetailShowCommentHistory()
+  var task_id = b:todoist_task_id
+  if empty(task_id)
+    echomsg 'Todoist: Save the task first'
+    return
+  endif
+  comments.ShowCommentHistory({'id': task_id, 'content': getline(1)[2 :]})
+enddef
+
+def OnDetailAddComment()
+  var task_id = b:todoist_task_id
+  if empty(task_id)
+    echomsg 'Todoist: Save the task first'
+    return
+  endif
+  comments.AddComment(task_id, getline(1)[2 :])
 enddef
 
 export def SaveBuffer()

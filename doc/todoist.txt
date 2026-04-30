@@ -105,6 +105,13 @@ pdd                     Archive the current project.
                                               *todoist_pDD*
 pDD                     Delete the current project.
 
+                                                *todoist_C*
+C                       Open full comment history for the current task
+                        in a read-only scratch buffer.
+
+                                               *todoist_ca*
+ca                      Add a comment to the current task.
+
 OPTIONS                                                       *todoist-options*
 
 Below is the default configuration:

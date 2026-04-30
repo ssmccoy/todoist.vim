@@ -157,6 +157,16 @@ export def DeleteTask(id: string, Callback: func(bool, any))
   Request('DELETE', '/tasks/' .. id, {}, Callback)
 enddef
 
+# --- Comment operations ---
+
+export def GetComments(task_id: string, Callback: func(bool, any))
+  PaginatedGet('/comments?task_id=' .. task_id, Callback)
+enddef
+
+export def AddComment(task_id: string, content: string, Callback: func(bool, any))
+  Request('POST', '/comments', {'task_id': task_id, 'content': content}, Callback)
+enddef
+
 # --- Sync API operations (for reorder/move) ---
 
 export def MoveTask(id: string, parent_id: any, project_id: string, Callback: func(bool, any))

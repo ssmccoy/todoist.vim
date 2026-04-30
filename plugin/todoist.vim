@@ -58,6 +58,10 @@ hi def link todoistTaskPri1        todoistPri1
 hi def link todoistTaskPri2        todoistPri2
 hi def link todoistTaskPri3        todoistPri3
 
+# Comment view highlights
+hi def link todoistCommentTitle  todoistTitle
+hi def link todoistCommentSep    Delimiter
+
 hi def link todoistErrorIcon      ErrorMsg
 hi def link todoistErrorMessage   ErrorMsg
 hi def link todoistWarningMessage WarningMsg

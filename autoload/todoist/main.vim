@@ -4,6 +4,7 @@ vim9script
 # Port of src/index.js — entry point, action handlers, buffer management
 
 import './api.vim' as api
+import './comments.vim' as comments
 import './compat.vim' as compat
 import './colors.vim' as colors
 import './detail.vim' as detail
@@ -34,6 +35,8 @@ def SetupMappings()
   nnoremap <buffer><silent> p1   <ScriptCmd>OnChangePriority(4)<CR>
   nnoremap <buffer><silent> <CR> <ScriptCmd>OnOpenDetail()<CR>
   nnoremap <buffer><silent> A    <ScriptCmd>OnCreateDetailed()<CR>
+  nnoremap <buffer><silent> C    <ScriptCmd>OnShowCommentHistory()<CR>
+  nnoremap <buffer><silent> ca   <ScriptCmd>OnAddComment()<CR>
 enddef
 
 # --- API key resolution ---
@@ -633,6 +636,23 @@ export def OnProjectChangeName()
     endif
     Refresh()
   })
+enddef
+
+export def OnShowCommentHistory()
+  var index = GetCurrentItemIndex()
+  if index < 0 || index >= len(S.state.items)
+    return
+  endif
+  comments.ShowCommentHistory(S.state.items[index])
+enddef
+
+export def OnAddComment()
+  var index = GetCurrentItemIndex()
+  if index < 0 || index >= len(S.state.items)
+    return
+  endif
+  var item = S.state.items[index]
+  comments.AddComment(item.id, get(item, 'content', ''))
 enddef
 
 export def ListProjects(): list<string>
