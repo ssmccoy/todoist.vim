@@ -98,6 +98,7 @@ def CreateBuffer()
   setlocal filetype=todoist
   setlocal buflisted
   setlocal buftype=nofile
+  setlocal noswapfile
   setlocal nomodifiable
   setlocal nolist
   setlocal nonumber
