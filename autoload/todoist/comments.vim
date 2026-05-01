@@ -40,12 +40,6 @@ enddef
 def FormatHistoryLines(task_content: string, comments: list<any>): list<string>
   var lines: list<string> = ['# Comments: ' .. task_content]
 
-  if empty(comments)
-    add(lines, '')
-    add(lines, 'No comments on this task.')
-    return lines
-  endif
-
   for comment in comments
     var posted = get(comment, 'posted_at', '')
     var date_str = empty(posted) ? '' : FormatDate(posted)
