@@ -37,10 +37,9 @@ export def FormatDate(iso: string): string
   return date_part .. ' ' .. time_part
 enddef
 
-def FormatHistoryLines(task_content: string, comments: list<any>): list<string>
-  var lines: list<string> = ['# Comments: ' .. task_content]
-
-  for comment in comments
+export def FormatCommentLines(comments_list: list<any>): list<string>
+  var lines: list<string> = []
+  for comment in comments_list
     var posted = get(comment, 'posted_at', '')
     var date_str = empty(posted) ? '' : FormatDate(posted)
     add(lines, '')
@@ -50,7 +49,12 @@ def FormatHistoryLines(task_content: string, comments: list<any>): list<string>
       lines += split(content, "\n")
     endif
   endfor
+  return lines
+enddef
 
+def FormatHistoryLines(task_content: string, comments_list: list<any>): list<string>
+  var lines: list<string> = ['# Comments: ' .. task_content]
+  lines += FormatCommentLines(comments_list)
   return lines
 enddef
 

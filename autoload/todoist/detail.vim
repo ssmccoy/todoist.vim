@@ -157,9 +157,19 @@ export def ParseBuffer(lines: list<string>): dict<any>
     i += 1
   endwhile
 
-  # Everything after blank line: description
-  if body_start < len(lines)
-    params.description = join(lines[body_start :], "\n")
+  # Everything after blank line until comments sentinel: description
+  var body_end = len(lines)
+  var j = body_start
+  while j < len(lines)
+    if lines[j] == '--- Comments ---'
+      body_end = j
+      break
+    endif
+    j += 1
+  endwhile
+
+  if body_start < body_end
+    params.description = join(lines[body_start : body_end - 1], "\n")
   else
     params.description = ''
   endif
@@ -173,6 +183,9 @@ export def OpenDetailBuffer(item: dict<any>)
   var lines = FormatTask(item)
   var task_id = get(item, 'id', '')
   SetupDetailBuffer(lines, task_id)
+  if !empty(task_id)
+    LoadComments(task_id)
+  endif
 enddef
 
 export def OpenNewTaskBuffer()
@@ -233,6 +246,23 @@ def OnDetailAddComment()
     return
   endif
   comments.AddComment(task_id, getline(1)[2 :])
+enddef
+
+def LoadComments(task_id: string)
+  var bufnr = bufnr('%')
+  api.GetComments(task_id, (ok: bool, data: any) => {
+    if !bufexists(bufnr)
+      return
+    endif
+    if !ok || empty(data)
+      return
+    endif
+    var lines = ['--- Comments ---'] + comments.FormatCommentLines(data)
+    setbufvar(bufnr, '&modified', 0)
+    var was_modifiable = getbufvar(bufnr, '&modifiable')
+    appendbufline(bufnr, '$', lines)
+    setbufvar(bufnr, '&modified', 0)
+  })
 enddef
 
 export def SaveBuffer()

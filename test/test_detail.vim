@@ -202,3 +202,39 @@ def g:Test_ParseBuffer_empty()
   var params = detail.ParseBuffer([])
   assert_equal({}, params)
 enddef
+
+def g:Test_ParseBuffer_with_comments()
+  SetupProjects()
+  var lines = [
+    '# Buy groceries',
+    'Project: Inbox | Pri: p1 | Due: tomorrow',
+    '',
+    'Remember the list',
+    '--- Comments ---',
+    '',
+    '--- 2024-01-15 14:30 ---',
+    'First comment',
+    '',
+    '--- 2024-01-16 09:15 ---',
+    'Second comment',
+  ]
+  var params = detail.ParseBuffer(lines)
+  assert_equal('Buy groceries', params.content)
+  assert_equal('Remember the list', params.description)
+enddef
+
+def g:Test_ParseBuffer_no_desc_with_comments()
+  SetupProjects()
+  var lines = [
+    '# Task title',
+    'Project: Inbox | Pri: p3 | Due: next Monday',
+    '',
+    '--- Comments ---',
+    '',
+    '--- 2024-01-15 14:30 ---',
+    'A comment',
+  ]
+  var params = detail.ParseBuffer(lines)
+  assert_equal('Task title', params.content)
+  assert_equal('', params.description)
+enddef
